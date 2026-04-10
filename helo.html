@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat 2 người - Giao diện Messenger (hiển thị ngang chuẩn)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    
+    <!-- Bootstrap CSS (chỉ dùng cho layout cơ bản) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- PeerJS -->
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    
+    <!-- Font Awesome (cho icon avatar) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        /* === RESET & CƠ BẢN === */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #f0f2f5;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+        
+        /* Container chính dạng flex cột full màn hình */
+        .chat-app {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            max-width: 800px;
+            margin: 0 auto;
+            background: #f0f2f5;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+        }
+        
+        /* Header thông tin */
+        .chat-header {
+            background: white;
+            padding: 12px 16px;
+            border-bottom: 1px solid #e0e0e0;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .peer-info {
+            background: #e9ecef;
+            border-radius: 20px;
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #2c3e50;
+            word-break: break-all;
+        }
+        
+        /* Khu vực chat box - kiểu Messenger */
+        .messenger-chat {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            background: #f0f2f5;
+        }
+        
+        /* Mỗi dòng tin nhắn (container bao gồm avatar + bubble) */
+        .message-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            max-width: 100%;
+            animation: fadeIn 0.2s ease;
+        }
+        
+        /* Tin nhắn của mình (bên phải) */
+        .message-row.me {
+            justify-content: flex-end;
+        }
+        
+        /* Tin nhắn của người khác (bên trái) */
+        .message-row.other {
+            justify-content: flex-start;
+        }
+        
+        /* Avatar hình tròn */
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #d9d9d9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        .avatar.me-avatar {
+            background: #0d6efd;
+            order: 2;
+        }
+        
+        .avatar.other-avatar {
+            background: #6c757d;
+            order: 0;
+        }
+        
+        /* Bubble chứa nội dung */
+        .bubble {
+            max-width: auto;
+            padding: 8px 12px;
+            border-radius: 18px;
+            font-size: 14px;
+            line-height: 1.4;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+            word-break: break-word;
+            position: relative;
+            box-shadow: 0 1px 1px rgba(0,0,0,0.05);
+        }
+        
+        /* Bubble của mình (xanh) */
+        .message-row.me .bubble {
+            background: #0d6efd;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        
+        /* Bubble của người khác (xám) */
+        .message-row.other .bubble {
+            background: #e9ecef;
+            color: #050505;
+            border-bottom-left-radius: 4px;
+        }
+        
+        /* Tên người gửi */
+        .sender-name {
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 2px;
+            color: #65676b;
+            padding-left: 4px;
+        }
+        
+        .message-row.me .sender-name {
+            text-align: right;
+            color: #8a8d91;
+        }
+        
+        /* Timestamp nhỏ */
+        .timestamp {
+            font-size: 10px;
+            color: #8a8d91;
+            margin-top: 2px;
+            margin-left: 8px;
+            margin-right: 8px;
+            white-space: nowrap;
+        }
+        
+        .message-row.me .timestamp {
+            text-align: right;
+        }
+        
+        /* Flex bố trí bubble và timestamp cùng phía */
+        .message-content {
+            display: flex;
+            flex-direction: column;
+            max-width: 80%;
+        }
+        
+        .message-row.me .message-content {
+            align-items: flex-end;
+        }
+        
+        .message-row.other .message-content {
+            align-items: flex-start;
+        }
+        
+        /* Footer nhập tin nhắn */
+        .chat-footer {
+            background: white;
+            padding: 10px 16px;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+        
+        #msgInput {
+            flex: 1;
+            border: none;
+            background: #f0f2f5;
+            border-radius: 24px;
+            padding: 10px 16px;
+            font-size: 15px;
+            resize: none;
+            font-family: inherit;
+            max-height: 100px;
+            overflow-y: auto;
+            outline: none;
+        }
+        
+        #msgInput:focus {
+            background: white;
+            border: 1px solid #0d6efd;
+        }
+        
+        .send-btn {
+            background: #0d6efd;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        
+        .send-btn:active {
+            transform: scale(0.95);
+            background: #0b5ed7;
+        }
+        
+        /* Kết nối area */
+        .connect-area {
+            background: white;
+            padding: 12px 16px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .input-group-custom {
+            display: flex;
+            gap: 8px;
+        }
+        
+        #connectId {
+            flex: 1;
+            border: 1px solid #ccd0d5;
+            border-radius: 24px;
+            padding: 10px 16px;
+            font-size: 14px;
+            outline: none;
+        }
+        
+        .connect-btn {
+            background: #0d6efd;
+            border: none;
+            border-radius: 24px;
+            padding: 0 20px;
+            color: white;
+            font-weight: 600;
+        }
+        
+        /* Animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Responsive */
+        @media (max-width: 600px) {
+            .bubble {
+                max-width: 85%;
+                font-size: 14px;
+            }
+            .avatar {
+                width: 32px;
+                height: 32px;
+                font-size: 14px;
+            }
+            .message-row {
+                gap: 6px;
+            }
+        }
+        
+        /* Scrollbar đẹp */
+        .messenger-chat::-webkit-scrollbar {
+            width: 6px;
+        }
+        .messenger-chat::-webkit-scrollbar-track {
+            background: #f0f2f5;
+        }
+        .messenger-chat::-webkit-scrollbar-thumb {
+            background: #bcc0c4;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="chat-app">
+    <!-- Header -->
+    <div class="chat-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div class="fw-bold">💬 Messenger 2 người</div>
+        <div class="peer-info">
+            <i class="fas fa-id-card me-1"></i> ID của bạn: <span id="myId">Đang tạo...</span>
+        </div>
+    </div>
+    
+    <!-- Kết nối -->
+    <div class="connect-area">
+        <div class="input-group-custom">
+            <input type="text" id="connectId" placeholder="Nhập ID người kia để kết nối" class="form-control-plaintext" style="background:#f0f2f5;">
+            <button class="connect-btn" onclick="connect()">Kết nối</button>
+        </div>
+        <div class="small text-muted mt-2" id="connStatus"></div>
+    </div>
+    
+    <!-- Khung chat -->
+    <div class="messenger-chat" id="chatBox"></div>
+    
+    <!-- Footer nhập tin nhắn -->
+    <div class="chat-footer">
+        <textarea id="msgInput" placeholder="Nhập tin nhắn..." rows="1"></textarea>
+        <button class="send-btn" onclick="sendMsg()">
+            <i class="fas fa-paper-plane"></i>
+        </button>
+    </div>
+</div>
+
+<script>
+    // ========== SỬA LỖI TRÊN MOBILE: DÙNG CẤU HÌNH PEER AN TOÀN ==========
+    // Thay vì new Peer() không tham số, dùng cấu hình secure, host, port rõ ràng
+    const peer = new Peer({
+        secure: true,           // bắt buộc dùng HTTPS (hỗ trợ mobile tốt hơn)
+        host: '0.peerjs.com',   // server public chính thức
+        port: 443,
+        path: '/'
+    });
+    
+    let conn = null;
+    const chatContainer = document.getElementById("chatBox");
+    const myIdSpan = document.getElementById("myId");
+    const connStatus = document.getElementById("connStatus");
+    
+    peer.on('open', function (id) {
+        myIdSpan.innerText = id;
+    });
+    
+    peer.on('connection', function (connection) {
+        conn = connection;
+        setupConnection();
+        connStatus.innerHTML = '<i class="fas fa-link text-success"></i> Đã kết nối! Bạn có thể nhắn tin.';
+    });
+    
+    // Bắt lỗi peer để hiển thị thông báo rõ ràng trên mobile
+    peer.on('error', function (err) {
+        console.error(err);
+        connStatus.innerHTML = '<i class="fas fa-exclamation-triangle text-danger"></i> Lỗi PeerJS: ' + err.message;
+    });
+    
+    function connect() {
+        const remoteId = document.getElementById("connectId").value.trim();
+        if (!remoteId) {
+            connStatus.innerHTML = '<i class="fas fa-exclamation-triangle text-warning"></i> Vui lòng nhập ID người kia';
+            return;
+        }
+        conn = peer.connect(remoteId);
+        setupConnection();
+        connStatus.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Đang kết nối...';
+    }
+    
+    function setupConnection() {
+        if (!conn) return;
+        conn.on('open', () => {
+            connStatus.innerHTML = '<i class="fas fa-check-circle text-success"></i> Kết nối thành công! Chat ngay.';
+        });
+        conn.on('data', function (data) {
+            addMessage(data, "other");
+        });
+        conn.on('error', (err) => {
+            console.error(err);
+            connStatus.innerHTML = '<i class="fas fa-times-circle text-danger"></i> Lỗi kết nối: ' + err.message;
+        });
+        conn.on('close', () => {
+            connStatus.innerHTML = '<i class="fas fa-plug text-secondary"></i> Đã ngắt kết nối';
+        });
+    }
+    
+    function sendMsg() {
+        const input = document.getElementById("msgInput");
+        const msg = input.value.trim();
+        if (!msg) return;
+        if (!conn) {
+            connStatus.innerHTML = '<i class="fas fa-plug text-danger"></i> Chưa kết nối với ai cả! Hãy nhập ID và kết nối.';
+            return;
+        }
+        conn.send(msg);
+        addMessage(msg, "me");
+        input.value = "";
+        input.style.height = "auto";
+    }
+    
+    // ============= HIỂN THỊ TIN NHẮN (GIỮ NGUYÊN) =============
+    function getAvatarElement(senderType) {
+        const avatarDiv = document.createElement("div");
+        avatarDiv.className = `avatar ${senderType === "me" ? "me-avatar" : "other-avatar"}`;
+        if (senderType === "me") {
+            avatarDiv.innerHTML = '<i class="fas fa-user-alt" style="font-size: 18px;"></i>';
+        } else {
+            avatarDiv.innerHTML = '<i class="fas fa-user-friends" style="font-size: 16px;"></i>';
+        }
+        return avatarDiv;
+    }
+    
+    function createBubble(text) {
+        const bubble = document.createElement("div");
+        bubble.className = "bubble";
+        bubble.innerText = text;
+        return bubble;
+    }
+    
+    function getSenderName(senderType) {
+        const nameSpan = document.createElement("div");
+        nameSpan.className = "sender-name";
+        nameSpan.innerText = senderType === "me" ? "Bạn" : "Đối phương";
+        return nameSpan;
+    }
+    
+    function getCurrentTime() {
+        const now = new Date();
+        return `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+    }
+    
+    function addMessage(msg, senderType) {
+        const row = document.createElement("div");
+        row.className = `message-row ${senderType}`;
+        
+        const avatar = getAvatarElement(senderType);
+        const contentDiv = document.createElement("div");
+        contentDiv.className = "message-content";
+        
+        const nameDiv = getSenderName(senderType);
+        const bubble = createBubble(msg);
+        const timeSpan = document.createElement("div");
+        timeSpan.className = "timestamp";
+        timeSpan.innerText = getCurrentTime();
+        
+        contentDiv.appendChild(nameDiv);
+        contentDiv.appendChild(bubble);
+        contentDiv.appendChild(timeSpan);
+        
+        if (senderType === "me") {
+            row.appendChild(contentDiv);
+            row.appendChild(avatar);
+        } else {
+            row.appendChild(avatar);
+            row.appendChild(contentDiv);
+        }
+        
+        chatContainer.appendChild(row);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+    
+    // Xử lý input tự động tăng chiều cao + gửi bằng Enter
+    const textarea = document.getElementById("msgInput");
+    textarea.addEventListener("input", function () {
+        this.style.height = "auto";
+        this.style.height = Math.min(this.scrollHeight, 100) + "px";
+    });
+    textarea.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            sendMsg();
+        }
+    });
+</script>
+</body>
+</html>
