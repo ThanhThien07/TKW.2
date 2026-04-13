@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý mượn sách thư viện - OOP trong JS</title>
+    <!-- Bootstrap 5 + FontAwesome -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body { background: #f4f7fc; }
+        .card-header { background-color: #2c3e50; color: white; }
+        .table-small td, .table-small th { font-size: 0.9rem; }
+        .border-left-info { border-left: 4px solid #17a2b8; }
+        .toast-container { position: fixed; top: 20px; right: 20px; z-index: 1100; }
+    </style>
+</head>
+<body>
+
+<div class="container my-4">
+    <h1 class="text-center mb-4"><i class="fas fa-book-open"></i> Quản lý mượn sách thư viện</h1>
+    <p class="text-center text-muted">Sử dụng lớp, kế thừa, interface & đa hình (JavaScript ES6)</p>
+
+    <!-- Các tab chính -->
+    <ul class="nav nav-tabs mb-4" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="docgia-tab" data-bs-toggle="tab" data-bs-target="#docgia" type="button" role="tab">👥 Độc giả</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="sach-tab" data-bs-toggle="tab" data-bs-target="#sach" type="button" role="tab">📚 Sách</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="muon-tab" data-bs-toggle="tab" data-bs-target="#muon" type="button" role="tab">📝 Lập phiếu mượn</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="dsmuon-tab" data-bs-toggle="tab" data-bs-target="#dsmuon" type="button" role="tab">📋 Danh sách phiếu mượn</button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="myTabContent">
+        <!-- Tab Độc giả -->
+        <div class="tab-pane fade show active" id="docgia" role="tabpanel">
+            <div class="card shadow-sm">
+                <div class="card-header">Thêm độc giả mới</div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <input type="text" id="dgMa" class="form-control" placeholder="Mã độc giả (VD: DG001)">
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" id="dgHoTen" class="form-control" placeholder="Họ tên">
+                        </div>
+                        <div class="col-md-4">
+                            <input type="email" id="dgEmail" class="form-control" placeholder="Email">
+                        </div>
+                        <div class="col-12">
+                            <button class="btn btn-primary" id="btnThemDocGia"><i class="fas fa-plus"></i> Thêm độc giả</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-header">Danh sách độc giả</div>
+                <div class="card-body">
+                    <table class="table table-bordered table-sm" id="tableDocGia">
+                        <thead class="table-light"><tr><th>Mã</th><th>Họ tên</th><th>Email</th></tr></thead>
+                        <tbody id="dsDocGiaBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Sách -->
+        <div class="tab-pane fade" id="sach" role="tabpanel">
+            <div class="card shadow-sm">
+                <div class="card-header">Thêm sách mới</div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-3"><input type="text" id="sMa" class="form-control" placeholder="Mã sách"></div>
+                        <div class="col-md-3"><input type="text" id="sTua" class="form-control" placeholder="Tựa sách"></div>
+                        <div class="col-md-3"><input type="text" id="sTacGia" class="form-control" placeholder="Tác giả"></div>
+                        <div class="col-md-2"><input type="number" id="sTon" class="form-control" placeholder="Tồn kho" value="5"></div>
+                        <div class="col-md-1">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="isSachGiaoKhoa">
+                                <label class="form-check-label" for="isSachGiaoKhoa">SGK</label>
+                            </div>
+                        </div>
+                        <div class="col-12"><button class="btn btn-success" id="btnThemSach"><i class="fas fa-plus"></i> Thêm sách</button></div>
+                    </div>
+                </div>
+                <div class="card-header">Danh sách sách trong thư viện</div>
+                <div class="card-body">
+                    <table class="table table-bordered table-sm" id="tableSach">
+                        <thead class="table-light"><tr><th>Mã</th><th>Tựa sách</th><th>Tác giả</th><th>Tồn kho</th><th>Loại</th></tr></thead>
+                        <tbody id="dsSachBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Lập phiếu mượn -->
+        <div class="tab-pane fade" id="muon" role="tabpanel">
+            <div class="card shadow-sm">
+                <div class="card-header">Tạo phiếu mượn mới</div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label>Chọn độc giả</label>
+                            <select id="selectDocGia" class="form-select"></select>
+                        </div>
+                        <div class="col-md-6">
+                            <label>Mã phiếu</label>
+                            <input type="text" id="maPhieu" class="form-control" placeholder="Tự động sinh" readonly>
+                        </div>
+                    </div>
+                    <hr>
+                    <h6><i class="fas fa-list"></i> Danh sách sách mượn</h6>
+                    <div class="row mb-2">
+                        <div class="col-md-5"><select id="selectSach" class="form-select"></select></div>
+                        <div class="col-md-3"><input type="number" id="soLuongMuon" class="form-control" placeholder="Số lượng" value="1" min="1"></div>
+                        <div class="col-md-2"><button id="btnThemSachVaoPhieu" class="btn btn-outline-primary"><i class="fas fa-cart-plus"></i> Thêm sách</button></div>
+                    </div>
+                    <table class="table table-sm" id="tableChiTietPhieu">
+                        <thead><tr><th>Sách</th><th>Số lượng</th><th>Thao tác</th></tr></thead>
+                        <tbody id="chitietPhieuBody"></tbody>
+                    </table>
+                    <button id="btnLuuPhieuMuon" class="btn btn-primary mt-2"><i class="fas fa-save"></i> Lưu phiếu mượn</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Danh sách phiếu mượn -->
+        <div class="tab-pane fade" id="dsmuon" role="tabpanel">
+            <div class="card shadow-sm">
+                <div class="card-header">Các phiếu mượn đã lập</div>
+                <div class="card-body">
+                    <div id="listPhieuMuon"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast thông báo -->
+<div class="toast-container">
+    <div id="liveToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="3000">
+        <div class="d-flex"><div class="toast-body" id="toastMessage"></div><button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button></div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // ==================== ĐỊNH NGHĨA INTERFACE & CÁC LỚP ====================
+    // Interface (mô phỏng)
+    class IKiemTraMuon {
+        coTheMuon(soLuong) { throw new Error("Phương thức coTheMuon phải được override"); }
+    }
+
+    // Lớp Sách
+    class Sach extends IKiemTraMuon {
+        #maSach; #tuaSach; #tacGia; #soLuongTon;
+        constructor(maSach, tuaSach, tacGia, soLuongTon) {
+            super();
+            this.#maSach = maSach;
+            this.#tuaSach = tuaSach;
+            this.#tacGia = tacGia;
+            this.#soLuongTon = soLuongTon;
+        }
+        get maSach() { return this.#maSach; }
+        get tuaSach() { return this.#tuaSach; }
+        get tacGia() { return this.#tacGia; }
+        get soLuongTon() { return this.#soLuongTon; }
+        set soLuongTon(val) { this.#soLuongTon = val; }
+        giamTonKho(soLuong) {
+            if (soLuong <= this.#soLuongTon) this.#soLuongTon -= soLuong;
+            else throw new Error(`Không đủ sách "${this.#tuaSach}" (tồn: ${this.#soLuongTon})`);
+        }
+        tangTonKho(soLuong) { this.#soLuongTon += soLuong; }
+        coTheMuon(soLuong) { return this.#soLuongTon >= soLuong; }
+        get loai() { return "Sách thường"; }
+    }
+
+    // Lớp Sách giáo khoa kế thừa Sach - thể hiện đa hình
+    class SachGiaoKhoa extends Sach {
+        static MAX_MUON = 2;
+        coTheMuon(soLuong) {
+            return super.coTheMuon(soLuong) && soLuong <= SachGiaoKhoa.MAX_MUON;
+        }
+        get loai() { return "Sách GK (tối đa 2 cuốn)"; }
+    }
+
+    // Lớp Độc giả
+    class DocGia {
+        #maDocGia; #hoTen; #email;
+        constructor(ma, hoTen, email) {
+            this.#maDocGia = ma;
+            this.#hoTen = hoTen;
+            this.#email = email;
+        }
+        get maDocGia() { return this.#maDocGia; }
+        get hoTen() { return this.#hoTen; }
+        get email() { return this.#email; }
+    }
+
+    // Lớp Chi tiết mượn
+    class ChiTietMuon {
+        constructor(sach, soLuong) {
+            this.sach = sach;
+            this.soLuong = soLuong;
+        }
+    }
+
+    // Lớp Phiếu mượn
+    class PhieuMuon {
+        static SO_NGAY_MUON_TOI_DA = 14;
+        constructor(maPhieu, docGia, ngayMuon = new Date()) {
+            this.maPhieu = maPhieu;
+            this.docGia = docGia;
+            this.ngayMuon = new Date(ngayMuon);
+            this.ngayTraHan = new Date(this.ngayMuon);
+            this.ngayTraHan.setDate(this.ngayTraHan.getDate() + PhieuMuon.SO_NGAY_MUON_TOI_DA);
+            this.dsChiTiet = [];
+        }
+        themSach(sach, soLuong) {
+            if (!sach.coTheMuon(soLuong)) {
+                throw new Error(`Sách "${sach.tuaSach}" không thể mượn ${soLuong} cuốn (kiểm tra tồn kho hoặc giới hạn SGK).`);
+            }
+            this.dsChiTiet.push(new ChiTietMuon(sach, soLuong));
+            sach.giamTonKho(soLuong); // cập nhật tồn kho ngay
+        }
+        tinhTrang() {
+            const homNay = new Date();
+            return homNay > this.ngayTraHan ? "Quá hạn" : "Còn hạn";
+        }
+    }
+
+    // ==================== QUẢN LÝ ỨNG DỤNG ====================
+    class ThuVienApp {
+        constructor() {
+            this.danhSachDocGia = [];
+            this.danhSachSach = [];
+            this.danhSachPhieuMuon = [];
+            this.phieuTam = null;       // phiếu đang tạo
+            this.nextMaPhieu = 1;
+            this.initDataMau();
+            this.bindEvents();
+            this.renderAll();
+        }
+
+        initDataMau() {
+            // Thêm vài độc giả mẫu
+            this.danhSachDocGia.push(new DocGia("DG001", "Nguyễn Văn An", "an@example.com"));
+            this.danhSachDocGia.push(new DocGia("DG002", "Trần Thị Bình", "binh@example.com"));
+            // Thêm sách mẫu
+            this.danhSachSach.push(new Sach("S001", "Lập trình JavaScript", "John Doe", 5));
+            this.danhSachSach.push(new SachGiaoKhoa("SGK01", "Toán 12", "Bộ GD", 3));
+            this.danhSachSach.push(new Sach("S002", "Cấu trúc dữ liệu", "Lê Văn C", 2));
+        }
+
+        bindEvents() {
+            document.getElementById("btnThemDocGia").onclick = () => this.themDocGia();
+            document.getElementById("btnThemSach").onclick = () => this.themSach();
+            document.getElementById("btnThemSachVaoPhieu").onclick = () => this.themSachVaoPhieuTam();
+            document.getElementById("btnLuuPhieuMuon").onclick = () => this.luuPhieuMuon();
+            // Khi chuyển tab "Lập phiếu mượn" thì khởi tạo phiếu mới
+            document.querySelector('button[data-bs-target="#muon"]').addEventListener('click', () => this.khoiTaoPhieuTam());
+            document.querySelector('button[data-bs-target="#dsmuon"]').addEventListener('click', () => this.renderDanhSachPhieu());
+        }
+
+        themDocGia() {
+            let ma = document.getElementById("dgMa").value.trim();
+            let hoten = document.getElementById("dgHoTen").value.trim();
+            let email = document.getElementById("dgEmail").value.trim();
+            if (!ma || !hoten || !email) return this.toast("Vui lòng nhập đủ thông tin độc giả", "warning");
+            if (this.danhSachDocGia.some(dg => dg.maDocGia === ma)) return this.toast("Mã độc giả đã tồn tại", "danger");
+            this.danhSachDocGia.push(new DocGia(ma, hoten, email));
+            this.toast("Thêm độc giả thành công");
+            this.renderDocGia();
+            document.getElementById("dgMa").value = ""; document.getElementById("dgHoTen").value = ""; document.getElementById("dgEmail").value = "";
+        }
+
+        themSach() {
+            let ma = document.getElementById("sMa").value.trim();
+            let tua = document.getElementById("sTua").value.trim();
+            let tg = document.getElementById("sTacGia").value.trim();
+            let ton = parseInt(document.getElementById("sTon").value);
+            let laSGK = document.getElementById("isSachGiaoKhoa").checked;
+            if (!ma || !tua || !tg || isNaN(ton)) return this.toast("Vui lòng nhập đủ thông tin sách", "warning");
+            if (this.danhSachSach.some(s => s.maSach === ma)) return this.toast("Mã sách đã tồn tại", "danger");
+            let sachMoi = laSGK ? new SachGiaoKhoa(ma, tua, tg, ton) : new Sach(ma, tua, tg, ton);
+            this.danhSachSach.push(sachMoi);
+            this.toast(`Thêm sách "${tua}" thành công`);
+            this.renderSach();
+            // clear form
+            document.getElementById("sMa").value = ""; document.getElementById("sTua").value = ""; document.getElementById("sTacGia").value = "";
+            document.getElementById("sTon").value = 5; document.getElementById("isSachGiaoKhoa").checked = false;
+        }
+
+        khoiTaoPhieuTam() {
+            // reset phiếu tạm
+            this.phieuTam = null;
+            this.renderSelectDocGia();
+            this.renderSelectSach();
+            document.getElementById("chitietPhieuBody").innerHTML = "";
+            document.getElementById("maPhieu").value = `PM${String(this.nextMaPhieu).padStart(3,'0')}`;
+            this.toast("Sẵn sàng tạo phiếu mượn mới", "info");
+        }
+
+        themSachVaoPhieuTam() {
+            if (!this.phieuTam) {
+                // chưa có phiếu => tạo phiếu tạm với độc giả đã chọn
+                let docGiaSelect = document.getElementById("selectDocGia");
+                let maDocGia = docGiaSelect.value;
+                let docGia = this.danhSachDocGia.find(d => d.maDocGia === maDocGia);
+                if (!docGia) return this.toast("Chưa chọn độc giả", "warning");
+                let maPhieu = document.getElementById("maPhieu").value;
+                this.phieuTam = new PhieuMuon(maPhieu, docGia, new Date());
+            }
+            let sachSelect = document.getElementById("selectSach");
+            let maSach = sachSelect.value;
+            let sach = this.danhSachSach.find(s => s.maSach === maSach);
+            let soLuong = parseInt(document.getElementById("soLuongMuon").value);
+            if (!sach || isNaN(soLuong) || soLuong < 1) return this.toast("Chọn sách và số lượng hợp lệ", "warning");
+            try {
+                // Kiểm tra đa hình: gọi coTheMuon của sach (sách thường hoặc SGK)
+                if (!sach.coTheMuon(soLuong)) throw new Error(`Sách "${sach.tuaSach}" không đủ điều kiện mượn (tồn: ${sach.soLuongTon}, hoặc SGK tối đa 2)`);
+                this.phieuTam.themSach(sach, soLuong);
+                this.renderChiTietPhieuTam();
+                this.renderSach(); // cập nhật lại tồn kho trên giao diện sách
+                this.toast(`Đã thêm ${soLuong} cuốn "${sach.tuaSach}" vào phiếu`);
+            } catch (e) {
+                this.toast(e.message, "danger");
+            }
+        }
+
+        renderChiTietPhieuTam() {
+            let tbody = document.getElementById("chitietPhieuBody");
+            if (!this.phieuTam) { tbody.innerHTML = "<tr><td colspan='3'>Chưa có sách nào</td></tr>"; return; }
+            tbody.innerHTML = this.phieuTam.dsChiTiet.map((ct, idx) => `
+                <tr><td>${ct.sach.tuaSach}</td><td>${ct.soLuong}</td>
+                <td><button class="btn btn-sm btn-danger" onclick="app.xoaChiTietTam(${idx})"><i class="fas fa-trash"></i></button></td></tr>
+            `).join("");
+        }
+
+        xoaChiTietTam(index) {
+            if (!this.phieuTam) return;
+            let ct = this.phieuTam.dsChiTiet[index];
+            ct.sach.tangTonKho(ct.soLuong); // hoàn tồn kho
+            this.phieuTam.dsChiTiet.splice(index,1);
+            this.renderChiTietPhieuTam();
+            this.renderSach();
+            this.toast("Đã xóa khỏi phiếu, hoàn trả số lượng sách");
+        }
+
+        luuPhieuMuon() {
+            if (!this.phieuTam || this.phieuTam.dsChiTiet.length === 0) return this.toast("Phiếu chưa có sách nào", "warning");
+            this.danhSachPhieuMuon.push(this.phieuTam);
+            this.nextMaPhieu++;
+            this.toast(`Lưu phiếu ${this.phieuTam.maPhieu} thành công!`);
+            this.phieuTam = null;
+            this.khoiTaoPhieuTam();  // reset giao diện
+            this.renderDanhSachPhieu();
+        }
+
+        renderDocGia() {
+            let tbody = document.getElementById("dsDocGiaBody");
+            tbody.innerHTML = this.danhSachDocGia.map(dg => `<tr><td>${dg.maDocGia}</td><td>${dg.hoTen}</td><td>${dg.email}</td></tr>`).join("");
+        }
+        renderSach() {
+            let tbody = document.getElementById("dsSachBody");
+            tbody.innerHTML = this.danhSachSach.map(s => `<tr><td>${s.maSach}</td><td>${s.tuaSach}</td><td>${s.tacGia}</td><td>${s.soLuongTon}</td><td>${s.loai}</td></tr>`).join("");
+        }
+        renderSelectDocGia() {
+            let select = document.getElementById("selectDocGia");
+            select.innerHTML = this.danhSachDocGia.map(dg => `<option value="${dg.maDocGia}">${dg.maDocGia} - ${dg.hoTen}</option>`).join("");
+        }
+        renderSelectSach() {
+            let select = document.getElementById("selectSach");
+            select.innerHTML = this.danhSachSach.map(s => `<option value="${s.maSach}">${s.maSach} - ${s.tuaSach} (còn ${s.soLuongTon})</option>`).join("");
+        }
+        renderDanhSachPhieu() {
+            let container = document.getElementById("listPhieuMuon");
+            if(this.danhSachPhieuMuon.length===0){
+                container.innerHTML = '<div class="alert alert-secondary">Chưa có phiếu mượn nào.</div>';
+                return;
+            }
+            let html = '';
+            for(let pm of this.danhSachPhieuMuon){
+                let dsSach = pm.dsChiTiet.map(ct => `<li>${ct.sach.tuaSach} (x${ct.soLuong})</li>`).join('');
+                html += `<div class="card mb-3 border-left-info">
+                            <div class="card-header bg-info text-white">Phiếu: ${pm.maPhieu} - Độc giả: ${pm.docGia.hoTen}</div>
+                            <div class="card-body">
+                                <p><strong>Ngày mượn:</strong> ${pm.ngayMuon.toLocaleDateString()} &nbsp; 
+                                <strong>Hạn trả:</strong> ${pm.ngayTraHan.toLocaleDateString()} (${PhieuMuon.SO_NGAY_MUON_TOI_DA} ngày) &nbsp;
+                                <span class="badge ${pm.tinhTrang()==='Quá hạn'?'bg-danger':'bg-success'}">${pm.tinhTrang()}</span></p>
+                                <strong>Sách mượn:</strong><ul>${dsSach}</ul>
+                            </div>
+                        </div>`;
+            }
+            container.innerHTML = html;
+        }
+
+        renderAll(){
+            this.renderDocGia();
+            this.renderSach();
+            this.khoiTaoPhieuTam();
+            this.renderDanhSachPhieu();
+        }
+
+        toast(msg, type='success'){
+            let toastEl = document.getElementById('liveToast');
+            let toastBody = document.getElementById('toastMessage');
+            toastBody.innerText = msg;
+            toastEl.classList.remove('bg-success','bg-danger','bg-warning');
+            if(type==='success') toastEl.classList.add('bg-success');
+            else if(type==='danger') toastEl.classList.add('bg-danger');
+            else toastEl.classList.add('bg-warning');
+            let bsToast = new bootstrap.Toast(toastEl);
+            bsToast.show();
+        }
+    }
+
+    // Khởi tạo app
+    let app;
+    window.addEventListener('DOMContentLoaded', () => {
+        app = new ThuVienApp();
+        window.app = app; // để gọi xoaChiTietTam từ inline
+    });
+</script>
+</body>
+</html>

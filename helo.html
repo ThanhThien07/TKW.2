@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Chat 2 người - Giao diện Messenger (hiển thị ngang chuẩn)</title>
+    <title>Chat 2 người - Messenger Style (Hoạt động trên Mobile)</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
     
     <!-- Bootstrap CSS (chỉ dùng cho layout cơ bản) -->
@@ -138,7 +138,7 @@
         
         /* Bubble của người khác (xám) */
         .message-row.other .bubble {
-            background: #e9ecef;
+            background: #e4e6eb;
             color: #050505;
             border-bottom-left-radius: 4px;
         }
@@ -304,11 +304,23 @@
             background: #bcc0c4;
             border-radius: 10px;
         }
+        
+        /* Thông báo trình duyệt */
+        .browser-warning {
+            background: #ffc107;
+            color: #000;
+            text-align: center;
+            padding: 5px;
+            font-size: 12px;
+            display: none;
+        }
     </style>
 </head>
 <body>
 <div class="chat-app">
-    <!-- Header -->
+    <div class="browser-warning" id="browserWarning">
+        ⚠️ Bạn đang dùng trình duyệt trong ứng dụng (Facebook, Zalo...). Hãy mở bằng Chrome/Safari để chat được.
+    </div>
     <div class="chat-header d-flex justify-content-between align-items-center flex-wrap gap-2">
         <div class="fw-bold">💬 Messenger 2 người</div>
         <div class="peer-info">
@@ -316,7 +328,6 @@
         </div>
     </div>
     
-    <!-- Kết nối -->
     <div class="connect-area">
         <div class="input-group-custom">
             <input type="text" id="connectId" placeholder="Nhập ID người kia để kết nối" class="form-control-plaintext" style="background:#f0f2f5;">
@@ -325,10 +336,8 @@
         <div class="small text-muted mt-2" id="connStatus"></div>
     </div>
     
-    <!-- Khung chat -->
     <div class="messenger-chat" id="chatBox"></div>
     
-    <!-- Footer nhập tin nhắn -->
     <div class="chat-footer">
         <textarea id="msgInput" placeholder="Nhập tin nhắn..." rows="1"></textarea>
         <button class="send-btn" onclick="sendMsg()">
@@ -338,13 +347,27 @@
 </div>
 
 <script>
-    // ========== SỬA LỖI TRÊN MOBILE: DÙNG CẤU HÌNH PEER AN TOÀN ==========
-    // Thay vì new Peer() không tham số, dùng cấu hình secure, host, port rõ ràng
+    // KIỂM TRA TRÌNH DUYỆT HỖ TRỢ WEBRTC
+    const isWebRTCSupported = !!window.RTCPeerConnection;
+    if (!isWebRTCSupported) {
+        document.getElementById('browserWarning').style.display = 'block';
+        document.getElementById('connStatus').innerHTML = '❌ Trình duyệt của bạn không hỗ trợ WebRTC. Hãy dùng Chrome hoặc Safari.';
+    }
+    
+    // CẤU HÌNH PEER VỚI NHIỀU ICE SERVER DỰ PHÒNG
     const peer = new Peer({
-        secure: true,           // bắt buộc dùng HTTPS (hỗ trợ mobile tốt hơn)
-        host: '0.peerjs.com',   // server public chính thức
-        port: 443,
-        path: '/'
+        config: {
+            iceServers: [
+                { urls: 'stun:stun.l.google.com:19302' },
+                { urls: 'stun:stun1.l.google.com:19302' },
+                { urls: 'stun:stun2.l.google.com:19302' },
+                { urls: 'stun:stun3.l.google.com:19302' },
+                { urls: 'stun:stun4.l.google.com:19302' },
+                { urls: 'stun:stun.ekiga.net' },
+                { urls: 'stun:stun.ideasip.com' }
+            ]
+        },
+        debug: 2  // hiển thị log chi tiết để dễ debug
     });
     
     let conn = null;
@@ -354,6 +377,7 @@
     
     peer.on('open', function (id) {
         myIdSpan.innerText = id;
+        connStatus.innerHTML = '✅ Sẵn sàng kết nối. ID của bạn đã có.';
     });
     
     peer.on('connection', function (connection) {
@@ -362,37 +386,40 @@
         connStatus.innerHTML = '<i class="fas fa-link text-success"></i> Đã kết nối! Bạn có thể nhắn tin.';
     });
     
-    // Bắt lỗi peer để hiển thị thông báo rõ ràng trên mobile
     peer.on('error', function (err) {
         console.error(err);
-        connStatus.innerHTML = '<i class="fas fa-exclamation-triangle text-danger"></i> Lỗi PeerJS: ' + err.message;
+        if (err.type === 'peer-unavailable') {
+            connStatus.innerHTML = '⚠️ Không tìm thấy ID người kia. Kiểm tra lại.';
+        } else {
+            connStatus.innerHTML = '⚠️ Lỗi kết nối: ' + (err.message || err.type);
+        }
     });
     
     function connect() {
         const remoteId = document.getElementById("connectId").value.trim();
         if (!remoteId) {
-            connStatus.innerHTML = '<i class="fas fa-exclamation-triangle text-warning"></i> Vui lòng nhập ID người kia';
+            connStatus.innerHTML = '⚠️ Vui lòng nhập ID người kia';
             return;
         }
         conn = peer.connect(remoteId);
         setupConnection();
-        connStatus.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Đang kết nối...';
+        connStatus.innerHTML = '⏳ Đang kết nối...';
     }
     
     function setupConnection() {
         if (!conn) return;
         conn.on('open', () => {
-            connStatus.innerHTML = '<i class="fas fa-check-circle text-success"></i> Kết nối thành công! Chat ngay.';
+            connStatus.innerHTML = '✅ Kết nối thành công! Chat ngay.';
         });
         conn.on('data', function (data) {
             addMessage(data, "other");
         });
         conn.on('error', (err) => {
             console.error(err);
-            connStatus.innerHTML = '<i class="fas fa-times-circle text-danger"></i> Lỗi kết nối: ' + err.message;
+            connStatus.innerHTML = '❌ Lỗi kết nối: ' + (err.message || 'không xác định');
         });
         conn.on('close', () => {
-            connStatus.innerHTML = '<i class="fas fa-plug text-secondary"></i> Đã ngắt kết nối';
+            connStatus.innerHTML = '🔌 Đã ngắt kết nối';
         });
     }
     
@@ -401,7 +428,7 @@
         const msg = input.value.trim();
         if (!msg) return;
         if (!conn) {
-            connStatus.innerHTML = '<i class="fas fa-plug text-danger"></i> Chưa kết nối với ai cả! Hãy nhập ID và kết nối.';
+            connStatus.innerHTML = '⚠️ Chưa kết nối với ai! Hãy nhập ID và kết nối.';
             return;
         }
         conn.send(msg);
@@ -410,7 +437,7 @@
         input.style.height = "auto";
     }
     
-    // ============= HIỂN THỊ TIN NHẮN (GIỮ NGUYÊN) =============
+    // ============= GIỮ NGUYÊN HÀM HIỂN THỊ TIN NHẮN =============
     function getAvatarElement(senderType) {
         const avatarDiv = document.createElement("div");
         avatarDiv.className = `avatar ${senderType === "me" ? "me-avatar" : "other-avatar"}`;
@@ -471,7 +498,6 @@
         chatContainer.scrollTop = chatContainer.scrollHeight;
     }
     
-    // Xử lý input tự động tăng chiều cao + gửi bằng Enter
     const textarea = document.getElementById("msgInput");
     textarea.addEventListener("input", function () {
         this.style.height = "auto";
