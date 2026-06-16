@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LoGo - Lịch diễn</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    
+    <!-- Bootstrap Icons -->
+    <link class="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    
+    <!-- FontAwesome 6 Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+        integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        /* Smooth Scrolling */
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 70px;
+        }
+
+        /* Accordion Custom Styling to remove default focus outlines */
+        .accordion-button:focus {
+            box-shadow: none;
+        }
+
+        .accordion-button:not(.collapsed) {
+            background-color: #f8f9fa;
+            color: #0d6efd;
+            box-shadow: none;
+        }
+
+        /* Hover translate effect for service cards */
+        .hover-translate {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .hover-translate:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1) !important;
+        }
+    </style>
+</head>
+
+<body class="bg-white text-dark">
+
+    <!-- Sticky Navigation Bar (Bài 1) -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top py-3 px-3">
+        <div class="container">
+            <a class="navbar-brand fw-bold fs-4 me-4" href="#trangchu">LoGo</a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+                aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active fs-5 me-3" aria-current="page" href="#trangchu">Trang Chủ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link fs-5 me-3" href="#tours">Tour</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link fs-5 me-3" href="#lienhe">Liên Hệ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link fs-5" href="#dichvu">Dịch Vụ</a>
+                    </li>
+                </ul>
+                <form class="d-flex" role="search" onsubmit="event.preventDefault();">
+                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                    <button class="btn btn-outline-success text-success" type="submit" style="border-color: #28a745;">Search</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Section: Trang chủ (Bài 1: Carousel) -->
+    <section id="trangchu">
+        <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-indicators">
+                <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active"
+                    aria-current="true" aria-label="Slide 1"></button>
+                <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1"
+                    aria-label="Slide 2"></button>
+                <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2"
+                    aria-label="Slide 3"></button>
+            </div>
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <img src="hinhanh_labs/imagetour/BTS-Speak-Yourself-Tour.jpg" class="d-block w-100 object-fit-cover" style="max-height: 600px;" alt="BTS Tour">
+                </div>
+                <div class="carousel-item">
+                    <img src="hinhanh_labs/imagetour/2.jpg" class="d-block w-100 object-fit-cover" style="max-height: 600px;" alt="Vịnh Hạ Long">
+                </div>
+                <div class="carousel-item">
+                    <img src="hinhanh_labs/imagetour/3.jpg" class="d-block w-100 object-fit-cover" style="max-height: 600px;" alt="Bà Nà Hills">
+                </div>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators"
+                data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators"
+                data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+    </section>
+
+    <!-- Section: LỊCH DIỄN / Tour (Bài 2) -->
+    <section id="tours">
+        <!-- Dark header container -->
+        <div class="bg-dark text-white py-5 px-3 text-center">
+            <div class="container">
+                <h2 class="display-5 fw-bold text-uppercase" style="letter-spacing: 2px;">LỊCH DIỄN</h2>
+                <p class="text-secondary small text-uppercase mb-3" style="letter-spacing: 3px;">BIT MAPS OF SOUL TOUR</p>
+                <p class="text-white-50 fst-italic mb-0">Các bạn nhớ đặt lịch nhé</p>
+            </div>
+        </div>
+
+        <div class="container py-5">
+            <!-- Accordion for Months -->
+            <div class="accordion border shadow-sm rounded-3 overflow-hidden" id="tourAccordion">
+                
+                <!-- 1. SEPTEMBER (Active by default) -->
+                <div class="accordion-item border-0">
+                    <h2 class="accordion-header" id="headingSeptember">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseSeptember" aria-expanded="true" aria-controls="collapseSeptember">
+                            <div class="d-flex justify-content-between align-items-center w-100 pe-3">
+                                <span class="fw-bold">SEPTEMBER</span>
+                                <span class="badge bg-danger rounded-pill px-3 py-2">3</span>
+                            </div>
+                        </button>
+                    </h2>
+                    <div id="collapseSeptember" class="accordion-collapse collapse show"
+                        aria-labelledby="headingSeptember" data-bs-parent="#tourAccordion">
+                        <div class="accordion-body bg-light py-4">
+                            <!-- Tour Cards inside September -->
+                            <div class="row row-cols-1 row-cols-md-3 g-4">
+                                <!-- Card 1: Hàn Quốc -->
+                                <div class="col">
+                                    <div class="card h-100 border border-light-subtle shadow-sm text-center">
+                                        <img src="hinhanh_labs/imagetour/hanquoc.jpg" class="card-img-top" alt="Hàn Quốc">
+                                        <div class="card-body">
+                                            <h5 class="card-title fw-bold">Hàn Quốc</h5>
+                                            <p class="card-text text-muted small">Satuday 8 September 2025</p>
+                                            <button class="btn btn-primary px-4 py-2" data-bs-toggle="modal"
+                                                data-bs-target="#ticketModal" data-tour="Hàn Quốc">Mua vé</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Card 2: Nhật Bản -->
+                                <div class="col">
+                                    <div class="card h-100 border border-light-subtle shadow-sm text-center">
+                                        <img src="hinhanh_labs/imagetour/nhatban.jpg" class="card-img-top" alt="Nhật Bản">
+                                        <div class="card-body">
+                                            <h5 class="card-title fw-bold">Nhật Bản</h5>
+                                            <p class="card-text text-muted small">Satuday 15 September 2025</p>
+                                            <button class="btn btn-primary px-4 py-2" data-bs-toggle="modal"
+                                                data-bs-target="#ticketModal" data-tour="Nhật Bản">Mua vé</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Card 3: Sài Gòn -->
+                                <div class="col">
+                                    <div class="card h-100 border border-light-subtle shadow-sm text-center">
+                                        <img src="hinhanh_labs/imagetour/saigon.jpg" class="card-img-top" alt="Sài Gòn">
+                                        <div class="card-body">
+                                            <h5 class="card-title fw-bold">Sài Gòn</h5>
+                                            <p class="card-text text-muted small">Satuday 24 September 2025</p>
+                                            <button class="btn btn-primary px-4 py-2" data-bs-toggle="modal"
+                                                data-bs-target="#ticketModal" data-tour="Sài Gòn">Mua vé</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. OCTORBER (Closed by default, with skeletons loading simulation) -->
+                <div class="accordion-item border-0 border-top">
+                    <h2 class="accordion-header" id="headingOctober">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseOctober" aria-expanded="false" aria-controls="collapseOctober">
+                            <div class="d-flex justify-content-between align-items-center w-100 pe-3">
+                                <span class="fw-bold">OCTORBER</span>
+                                <span class="badge bg-danger rounded-pill px-3 py-2">5</span>
+                            </div>
+                        </button>
+                    </h2>
+                    <div id="collapseOctober" class="accordion-collapse collapse"
+                        aria-labelledby="headingOctober" data-bs-parent="#tourAccordion">
+                        <div class="accordion-body bg-light py-4">
+                            <div class="row row-cols-1 row-cols-md-3 g-4" id="october-content">
+                                <!-- Placeholder Skeleton Card 1 -->
+                                <div class="col skeleton-card">
+                                    <div class="card h-100 border-0 shadow-sm text-center" aria-hidden="true">
+                                        <div class="placeholder-glow">
+                                            <div class="placeholder w-100" style="height: 180px; background-color: #a0a0a0;"></div>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="placeholder-glow">
+                                                <h5 class="placeholder col-6 bg-secondary mb-3 py-2 rounded"></h5>
+                                                <p class="placeholder col-8 bg-secondary mb-4 py-1.5 rounded d-block mx-auto"></p>
+                                                <div class="placeholder col-4 bg-primary py-3 rounded d-block mx-auto"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Placeholder Skeleton Card 2 -->
+                                <div class="col skeleton-card">
+                                    <div class="card h-100 border-0 shadow-sm text-center" aria-hidden="true">
+                                        <div class="placeholder-glow">
+                                            <div class="placeholder w-100" style="height: 180px; background-color: #a0a0a0;"></div>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="placeholder-glow">
+                                                <h5 class="placeholder col-6 bg-secondary mb-3 py-2 rounded"></h5>
+                                                <p class="placeholder col-8 bg-secondary mb-4 py-1.5 rounded d-block mx-auto"></p>
+                                                <div class="placeholder col-4 bg-primary py-3 rounded d-block mx-auto"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Placeholder Skeleton Card 3 -->
+                                <div class="col skeleton-card">
+                                    <div class="card h-100 border-0 shadow-sm text-center" aria-hidden="true">
+                                        <div class="placeholder-glow">
+                                            <div class="placeholder w-100" style="height: 180px; background-color: #a0a0a0;"></div>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="placeholder-glow">
+                                                <h5 class="placeholder col-6 bg-secondary mb-3 py-2 rounded"></h5>
+                                                <p class="placeholder col-8 bg-secondary mb-4 py-1.5 rounded d-block mx-auto"></p>
+                                                <div class="placeholder col-4 bg-primary py-3 rounded d-block mx-auto"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. NOVEMBER (Closed by default, with skeletons loading simulation) -->
+                <div class="accordion-item border-0 border-top">
+                    <h2 class="accordion-header" id="headingNovember">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseNovember" aria-expanded="false" aria-controls="collapseNovember">
+                            <div class="d-flex justify-content-between align-items-center w-100 pe-3">
+                                <span class="fw-bold">NOVEMBER</span>
+                                <span class="badge bg-danger rounded-pill px-3 py-2">13</span>
+                            </div>
+                        </button>
+                    </h2>
+                    <div id="collapseNovember" class="accordion-collapse collapse"
+                        aria-labelledby="headingNovember" data-bs-parent="#tourAccordion">
+                        <div class="accordion-body bg-light py-4">
+                            <div class="row row-cols-1 row-cols-md-3 g-4" id="november-content">
+                                <!-- Placeholder Skeleton Card 1 -->
+                                <div class="col skeleton-card">
+                                    <div class="card h-100 border-0 shadow-sm text-center" aria-hidden="true">
+                                        <div class="placeholder-glow">
+                                            <div class="placeholder w-100" style="height: 180px; background-color: #a0a0a0;"></div>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="placeholder-glow">
+                                                <h5 class="placeholder col-6 bg-secondary mb-3 py-2 rounded"></h5>
+                                                <p class="placeholder col-8 bg-secondary mb-4 py-1.5 rounded d-block mx-auto"></p>
+                                                <div class="placeholder col-4 bg-primary py-3 rounded d-block mx-auto"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Placeholder Skeleton Card 2 -->
+                                <div class="col skeleton-card">
+                                    <div class="card h-100 border-0 shadow-sm text-center" aria-hidden="true">
+                                        <div class="placeholder-glow">
+                                            <div class="placeholder w-100" style="height: 180px; background-color: #a0a0a0;"></div>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="placeholder-glow">
+                                                <h5 class="placeholder col-6 bg-secondary mb-3 py-2 rounded"></h5>
+                                                <p class="placeholder col-8 bg-secondary mb-4 py-1.5 rounded d-block mx-auto"></p>
+                                                <div class="placeholder col-4 bg-primary py-3 rounded d-block mx-auto"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Placeholder Skeleton Card 3 -->
+                                <div class="col skeleton-card">
+                                    <div class="card h-100 border-0 shadow-sm text-center" aria-hidden="true">
+                                        <div class="placeholder-glow">
+                                            <div class="placeholder w-100" style="height: 180px; background-color: #a0a0a0;"></div>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="placeholder-glow">
+                                                <h5 class="placeholder col-6 bg-secondary mb-3 py-2 rounded"></h5>
+                                                <p class="placeholder col-8 bg-secondary mb-4 py-1.5 rounded d-block mx-auto"></p>
+                                                <div class="placeholder col-4 bg-primary py-3 rounded d-block mx-auto"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Section: Liên hệ & Blog (Bài 3) -->
+    <section id="lienhe" class="py-5 bg-white">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold display-5">Contact</h2>
+                <p class="text-secondary fst-italic">We love our fans!</p>
+            </div>
+
+            <div class="row g-4 align-items-start mb-5">
+                <!-- Column Left: Contact Details -->
+                <div class="col-md-5 ps-md-4">
+                    <h5 class="fw-semibold mb-3">Fan? Drop a note</h5>
+                    <p class="mb-2"><i class="fa-solid fa-map-marker-alt me-3 text-secondary" style="width: 15px;"></i>Seoul, us</p>
+                    <p class="mb-2"><i class="fa-solid fa-phone me-3 text-secondary" style="width: 15px;"></i>Phone: +001515151515</p>
+                    <p class="mb-2"><i class="fa-solid fa-envelope me-3 text-secondary" style="width: 15px;"></i>Email: mail@mail.com</p>
+                </div>
+
+                <!-- Column Right: Form with Floating Labels -->
+                <div class="col-md-7">
+                    <form id="contactForm" onsubmit="alert('Cảm ơn bạn đã liên hệ!'); event.preventDefault();">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="floatingName" placeholder="Name" required>
+                            <label for="floatingName">Name</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="email" class="form-control" id="floatingEmail" placeholder="Enter email" required>
+                            <label for="floatingEmail">Enter email</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <textarea class="form-control" id="floatingComment" placeholder="Comment" style="height: 120px;" required></textarea>
+                            <label for="floatingComment">Comment</label>
+                        </div>
+                        <button type="submit" class="btn btn-primary float-end px-4 py-2">Send</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Blog Section Tabs -->
+            <div class="row pt-4 border-top">
+                <div class="col-12 text-center mb-4">
+                    <h5 class="fw-bold">From The Blog</h5>
+                </div>
+                <div class="col-md-8 mx-auto">
+                    <!-- Tab Headers -->
+                    <ul class="nav nav-tabs justify-content-center border-bottom" id="blogTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="mike-tab" data-bs-toggle="tab" data-bs-target="#mike"
+                                type="button" role="tab" aria-controls="mike" aria-selected="false">Mike</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="chandler-tab" data-bs-toggle="tab" data-bs-target="#chandler"
+                                type="button" role="tab" aria-controls="chandler" aria-selected="false">Chandler</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active fw-bold" id="peter-tab" data-bs-toggle="tab" data-bs-target="#peter"
+                                type="button" role="tab" aria-controls="peter" aria-selected="true">Peter</button>
+                        </li>
+                    </ul>
+
+                    <!-- Tab Contents -->
+                    <div class="tab-content text-center py-4" id="blogTabContent">
+                        <div class="tab-pane fade" id="mike" role="tabpanel" aria-labelledby="mike-tab">
+                            <div class="py-2">
+                                <p class="mb-0 text-muted">Mike: Concert was awesome! Standard tour dates, really enjoyed it.</p>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="chandler" role="tabpanel" aria-labelledby="chandler-tab">
+                            <div class="py-2">
+                                <p class="mb-0 text-muted">Chandler: Good stage lighting, awesome crowd. Loved the vibes.</p>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade show active" id="peter" role="tabpanel" aria-labelledby="peter-tab">
+                            <div class="py-2">
+                                <p class="mb-0">Peter I mean, sometime I enjoy the show, but other times I enjoy other things</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Section: Dịch vụ (Bài 4) -->
+    <section id="dichvu" class="py-5 bg-light">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold display-5">DỊCH VỤ</h2>
+                <p class="text-secondary fst-italic">What we offer</p>
+            </div>
+
+            <!-- Grid: 3 columns x 2 rows = 6 items -->
+            <div class="row g-4">
+                <!-- Card 1: POWER -->
+                <div class="col-md-4">
+                    <div class="card h-100 border border-light-subtle shadow-sm p-4 text-center hover-translate">
+                        <div class="mb-3">
+                            <i class="fa-solid fa-power-off text-danger" style="font-size: 2.8rem;"></i>
+                        </div>
+                        <h5 class="fw-bold mb-2">POWER</h5>
+                        <p class="text-muted small mb-0">Some example text.</p>
+                    </div>
+                </div>
+                <!-- Card 2: LOVE -->
+                <div class="col-md-4">
+                    <div class="card h-100 border border-light-subtle shadow-sm p-4 text-center hover-translate">
+                        <div class="mb-3">
+                            <i class="fa-solid fa-heart text-danger" style="font-size: 2.8rem;"></i>
+                        </div>
+                        <h5 class="fw-bold mb-2">LOVE</h5>
+                        <p class="text-muted small mb-0">Some example text.</p>
+                    </div>
+                </div>
+                <!-- Card 3: JOB DONE -->
+                <div class="col-md-4">
+                    <div class="card h-100 border border-light-subtle shadow-sm p-4 text-center hover-translate">
+                        <div class="mb-3">
+                            <i class="fa-solid fa-lock text-danger" style="font-size: 2.8rem;"></i>
+                        </div>
+                        <h5 class="fw-bold mb-2">JOB DONE</h5>
+                        <p class="text-muted small mb-0">Some example text.</p>
+                    </div>
+                </div>
+                <!-- Card 4: GREEN -->
+                <div class="col-md-4">
+                    <div class="card h-100 border border-light-subtle shadow-sm p-4 text-center hover-translate">
+                        <div class="mb-3">
+                            <i class="fa-solid fa-leaf text-danger" style="font-size: 2.8rem;"></i>
+                        </div>
+                        <h5 class="fw-bold mb-2">GREEN</h5>
+                        <p class="text-muted small mb-0">Some example text.</p>
+                    </div>
+                </div>
+                <!-- Card 5: CERTIFIED -->
+                <div class="col-md-4">
+                    <div class="card h-100 border border-light-subtle shadow-sm p-4 text-center hover-translate">
+                        <div class="mb-3">
+                            <i class="fa-solid fa-certificate text-danger" style="font-size: 2.8rem;"></i>
+                        </div>
+                        <h5 class="fw-bold mb-2">CERTIFIED</h5>
+                        <p class="text-muted small mb-0">Some example text.</p>
+                    </div>
+                </div>
+                <!-- Card 6: HARD WORD=K -->
+                <div class="col-md-4">
+                    <div class="card h-100 border border-light-subtle shadow-sm p-4 text-center hover-translate">
+                        <div class="mb-3">
+                            <i class="fa-solid fa-desktop text-danger" style="font-size: 2.8rem;"></i>
+                        </div>
+                        <h5 class="fw-bold mb-2">HARD WORD=K</h5>
+                        <p class="text-muted small mb-0">Some example text.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Simple Footer -->
+    <footer class="bg-dark text-white py-4 text-center">
+        <p class="mb-0 small">&copy; 2026 ITC Travel. Thiết kế bởi Hoàng Hưng - MSSV - Lớp TKW.2</p>
+    </footer>
+
+    <!-- Ticket Modal (Bài 2: Hộp thoại Modal) -->
+    <div class="modal fade" id="ticketModal" tabindex="-1" aria-labelledby="ticketModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-2 overflow-hidden shadow-lg border-0" style="max-width: 500px;">
+                <!-- Header: White, title Ticket centered -->
+                <div class="modal-header border-0 pb-0 pt-4 px-4">
+                    <h5 class="modal-title w-100 text-center fw-bold fs-3" id="ticketModalLabel">Ticket</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                
+                <!-- Body -->
+                <div class="modal-body px-4 pb-3 pt-3">
+                    <form id="ticketBookingForm" onsubmit="alert('Đặt vé thành công!'); $('#ticketModal').modal('hide'); event.preventDefault();">
+                        <!-- Floating Label 1: Tickets, $23 per person -->
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="floatingQuantity" placeholder="How many?" required>
+                            <label for="floatingQuantity">Tickets, $23 per person</label>
+                        </div>
+                        
+                        <!-- Floating Label 2: Send to -->
+                        <div class="form-floating mb-3">
+                            <input type="email" class="form-control" id="floatingEmailSend" placeholder="Enter email" required>
+                            <label for="floatingEmailSend">Send to</label>
+                        </div>
+                        
+                        <!-- Pay Center Button -->
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-link text-decoration-none fw-bold fs-5 py-2">Pay</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Footer: Red Close button on right -->
+                <div class="modal-footer border-0 pt-0 pb-4 px-4 justify-content-end">
+                    <button type="button" class="btn btn-danger px-4" data-bs-dismiss="modal" 
+                        style="background-color: #d9534f; border-color: #d43f3a; border-radius: 4px;">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+
+    <!-- jQuery for simple DOM manip/simulating lazy loading -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+        crossorigin="anonymous"></script>
+
+    <script>
+        $(document).ready(function() {
+            // Modal Tour Name assignment dynamically when opened
+            $('#ticketModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                var tourName = button.data('tour');
+                var modal = $(this);
+            });
+
+            // Handle lazy loading simulation for October
+            $('#collapseOctober').on('shown.bs.collapse', function () {
+                var content = $('#october-content');
+                if (content.hasClass('loaded')) return;
+                
+                setTimeout(function() {
+                    content.fadeOut(200, function() {
+                        content.html(`
+                            <div class="col animate__animated animate__fadeIn">
+                                <div class="card h-100 border border-light-subtle shadow-sm text-center">
+                                    <img src="hinhanh_labs/imagetour/c1.jpg" class="card-img-top" alt="Đà Nẵng">
+                                    <div class="card-body">
+                                        <h5 class="card-title fw-bold">Đà Nẵng</h5>
+                                        <p class="card-text text-muted small">Satuday 6 October 2025</p>
+                                        <button class="btn btn-primary px-4 py-2" data-bs-toggle="modal" 
+                                            data-bs-target="#ticketModal" data-tour="Đà Nẵng">Mua vé</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col animate__animated animate__fadeIn">
+                                <div class="card h-100 border border-light-subtle shadow-sm text-center">
+                                    <img src="hinhanh_labs/imagetour/c3.jpg" class="card-img-top" alt="Hà Nội">
+                                    <div class="card-body">
+                                        <h5 class="card-title fw-bold">Hà Nội</h5>
+                                        <p class="card-text text-muted small">Satuday 13 October 2025</p>
+                                        <button class="btn btn-primary px-4 py-2" data-bs-toggle="modal" 
+                                            data-bs-target="#ticketModal" data-tour="Hà Nội">Mua vé</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col animate__animated animate__fadeIn">
+                                <div class="card h-100 border border-light-subtle shadow-sm text-center">
+                                    <img src="hinhanh_labs/imagetour/c4.jpg" class="card-img-top" alt="Nha Trang">
+                                    <div class="card-body">
+                                        <h5 class="card-title fw-bold">Nha Trang</h5>
+                                        <p class="card-text text-muted small">Satuday 20 October 2025</p>
+                                        <button class="btn btn-primary px-4 py-2" data-bs-toggle="modal" 
+                                            data-bs-target="#ticketModal" data-tour="Nha Trang">Mua vé</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `).fadeIn(200).addClass('loaded');
+                    });
+                }, 1000);
+            });
+
+            // Handle lazy loading simulation for November
+            $('#collapseNovember').on('shown.bs.collapse', function () {
+                var content = $('#november-content');
+                if (content.hasClass('loaded')) return;
+                
+                setTimeout(function() {
+                    content.fadeOut(200, function() {
+                        content.html(`
+                            <div class="col animate__animated animate__fadeIn">
+                                <div class="card h-100 border border-light-subtle shadow-sm text-center">
+                                    <img src="hinhanh_labs/imagetour/c2.jpg" class="card-img-top" alt="Vịnh Hạ Long">
+                                    <div class="card-body">
+                                        <h5 class="card-title fw-bold">Vịnh Hạ Long</h5>
+                                        <p class="card-text text-muted small">Satuday 10 November 2025</p>
+                                        <button class="btn btn-primary px-4 py-2" data-bs-toggle="modal" 
+                                            data-bs-target="#ticketModal" data-tour="Vịnh Hạ Long">Mua vé</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col animate__animated animate__fadeIn">
+                                <div class="card h-100 border border-light-subtle shadow-sm text-center">
+                                    <img src="hinhanh_labs/imagetour/c5.jpg" class="card-img-top" alt="Phú Quốc">
+                                    <div class="card-body">
+                                        <h5 class="card-title fw-bold">Phú Quốc</h5>
+                                        <p class="card-text text-muted small">Satuday 17 November 2025</p>
+                                        <button class="btn btn-primary px-4 py-2" data-bs-toggle="modal" 
+                                            data-bs-target="#ticketModal" data-tour="Phú Quốc">Mua vé</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col animate__animated animate__fadeIn">
+                                <div class="card h-100 border border-light-subtle shadow-sm text-center">
+                                    <img src="hinhanh_labs/imagetour/c6.jpg" class="card-img-top" alt="Đà Lạt">
+                                    <div class="card-body">
+                                        <h5 class="card-title fw-bold">Đà Lạt</h5>
+                                        <p class="card-text text-muted small">Satuday 24 November 2025</p>
+                                        <button class="btn btn-primary px-4 py-2" data-bs-toggle="modal" 
+                                            data-bs-target="#ticketModal" data-tour="Đà Lạt">Mua vé</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `).fadeIn(200).addClass('loaded');
+                    });
+                }, 1000);
+            });
+        });
+    </script>
+</body>
+
+</html>
